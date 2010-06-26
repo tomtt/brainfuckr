@@ -77,6 +77,16 @@ end
     its(:tape) { should == [0, 0, 17, 17, 23, 23] }
   end
 
+  context "after executing a program that uses nested loops" do
+    before do
+      @program = "+++[->++++[->+++<]<]"
+    end
+
+    subject { Brainfuck.new(@program).execute }
+
+    its(:tape) { should == [0, 0, 36] }
+  end
+
   context "after executing a program with multiple loops some of which are not executed" do
     before do
       @program = "[][]++[->+++<]"
@@ -89,5 +99,13 @@ end
 
   it "raises an error when moving the data_pointer beyond the first position" do
     lambda { Brainfuck.new("<").execute }.should raise_error
+  end
+
+  it "raises a syntax error when executing a program with more opening braces than closing ones" do
+    lambda { Brainfuck.new("+[+[-]").execute }.should raise_error(Brainfuck::SyntaxError, "Unmatched '['")
+  end
+
+  it "raises a syntax error when executing a program with more closing braces than opening ones" do
+    lambda { Brainfuck.new("++]").execute }.should raise_error(Brainfuck::SyntaxError, "Unmatched ']'")
   end
 end

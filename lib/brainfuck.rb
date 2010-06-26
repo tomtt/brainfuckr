@@ -3,7 +3,8 @@ if defined?(Gem) && Gem.available?('ruby-debug')
 end
 
 class Brainfuck
-  class Data_PointerError < StandardError; end
+  class DataPointerError < StandardError; end
+  class SyntaxError < StandardError; end
 
   NUMBER_OF_VALUES = 256
 
@@ -16,13 +17,14 @@ class Brainfuck
     @data_pointer = 0
     @instruction_pointer = 0
     @instruction_count = 0
+    compute_jump_indices
   end
 
   def execute(input = [])
     @input = input
     while(@instruction_pointer < @program.size) do
       @instruction_count += 1
-      debugger if @instruction_count > 10000
+      # debugger if @instruction_count > 10000
       case @program[@instruction_pointer].chr
       when "."
         execute_put
@@ -40,13 +42,10 @@ class Brainfuck
         if @tape[@data_pointer] == 0
           execute_jump_forward
           next
-        else
-          @loop_start = @instruction_pointer
         end
       when "]"
         if @tape[@data_pointer] != 0
           execute_jump_backward
-          next
         end
       end
       @instruction_pointer += 1
@@ -70,7 +69,7 @@ class Brainfuck
   end
 
   def execute_ptr_left
-    raise Data_PointerError unless @data_pointer > 0
+    raise DataPointerError unless @data_pointer > 0
     @data_pointer -= 1
   end
 
@@ -94,10 +93,29 @@ class Brainfuck
   end
 
   def execute_jump_forward
-    @instruction_pointer = @program.index(']', @instruction_pointer) + 1
+    # @instruction_pointer = @program.index(']', @instruction_pointer)
+    @instruction_pointer = @closing_for_opening[@instruction_pointer]
   end
 
   def execute_jump_backward
-    @instruction_pointer = @loop_start
+    # @instruction_pointer = @program.rindex('[', @instruction_pointer)
+    @instruction_pointer = @opening_for_closing[@instruction_pointer]
+  end
+
+  def compute_jump_indices
+    opening_loops = []
+    @closing_for_opening = {}
+    @opening_for_closing = {}
+    @program.size.times do |index|
+      if @program[index].chr == '['
+        opening_loops << index
+      elsif @program[index].chr == ']'
+        raise SyntaxError.new("Unmatched ']'") if opening_loops.empty?
+        opening = opening_loops.pop
+        @closing_for_opening[opening] = index
+        @opening_for_closing[index] = opening
+      end
+    end
+    raise SyntaxError.new("Unmatched '['") unless opening_loops.empty?
   end
 end
