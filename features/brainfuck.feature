@@ -1,9 +1,12 @@
-Feature: something something
-  In order to something something
-  A user something something
-  something something something
+Feature: Brainfuck interpreter
+  In order to experiment with the brainfuck language
+  A programmer
+  Must be able to see the result of a brainfuck program
 
-  Scenario: something something
-    Given inspiration
-    When I create a sweet new gem
-    Then everyone should see how awesome I am
+  Scenario: Hello World on a single line
+    Given the following brainfuck program:
+      """
+++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.
+      """
+    When that brainfuck program is executed
+    Then the output of that brain fuck program should be "Hello World!\n"
