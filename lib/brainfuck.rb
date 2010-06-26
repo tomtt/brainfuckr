@@ -26,8 +26,6 @@ class Brainfuck
       @instruction_count += 1
       # debugger if @instruction_count > 10000
       case @program[@instruction_pointer].chr
-      when "."
-        execute_put
       when ">"
         execute_ptr_right
       when "<"
@@ -36,8 +34,6 @@ class Brainfuck
         execute_incr
       when "-"
         execute_decr
-      when ","
-        execute_get
       when "["
         if @tape[@data_pointer] == 0
           execute_jump_forward
@@ -47,6 +43,10 @@ class Brainfuck
         if @tape[@data_pointer] != 0
           execute_jump_backward
         end
+      when "."
+        execute_put
+      when ","
+        execute_get
       end
       @instruction_pointer += 1
     end
@@ -107,9 +107,10 @@ class Brainfuck
     @closing_for_opening = {}
     @opening_for_closing = {}
     @program.size.times do |index|
-      if @program[index].chr == '['
+      case @program[index].chr
+      when '['
         opening_loops << index
-      elsif @program[index].chr == ']'
+      when ']'
         raise SyntaxError.new("Unmatched ']'") if opening_loops.empty?
         opening = opening_loops.pop
         @closing_for_opening[opening] = index
