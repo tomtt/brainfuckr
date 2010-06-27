@@ -3,6 +3,14 @@ Feature: Brainfuck interpreter
   A programmer
   Must be able to see the result of a brainfuck program
 
+  Scenario: Print a single character
+    Given the following brainfuck program:
+      """
+++++[>++++++++<-]>+.
+      """
+    When that brainfuck program is executed
+    Then the output of that brain fuck program should be "!"
+
   Scenario: Hello World on a single line
     Given the following brainfuck program:
       """
@@ -10,14 +18,6 @@ Feature: Brainfuck interpreter
       """
     When that brainfuck program is executed
     Then the output of that brain fuck program should be "Hello World!\n"
-
-  Scenario: Print a single character
-    Given the following brainfuck program:
-      """
-+++++++++++++++++++++++++++++++++.
-      """
-    When that brainfuck program is executed
-    Then the output of that brain fuck program should be "!"
 
   Scenario: Comments not using any brainfuck commands
     Given the following brainfuck program:
