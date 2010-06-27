@@ -93,30 +93,28 @@ class Brainfuck
   end
 
   def execute_jump_forward
-    # @instruction_pointer = @program.index(']', @instruction_pointer)
     @instruction_pointer = @closing_for_opening[@instruction_pointer]
   end
 
   def execute_jump_backward
-    # @instruction_pointer = @program.rindex('[', @instruction_pointer)
     @instruction_pointer = @opening_for_closing[@instruction_pointer]
   end
 
   def compute_jump_indices
-    opening_loops = []
+    jump_start_indices = []
     @closing_for_opening = {}
     @opening_for_closing = {}
     @program.size.times do |index|
       case @program[index].chr
       when '['
-        opening_loops << index
+        jump_start_indices << index
       when ']'
-        raise SyntaxError.new("Unmatched ']'") if opening_loops.empty?
-        opening = opening_loops.pop
+        raise SyntaxError.new("Unmatched ']'") if jump_start_indices.empty?
+        opening = jump_start_indices.pop
         @closing_for_opening[opening] = index
         @opening_for_closing[index] = opening
       end
     end
-    raise SyntaxError.new("Unmatched '['") unless opening_loops.empty?
+    raise SyntaxError.new("Unmatched '['") unless jump_start_indices.empty?
   end
 end
