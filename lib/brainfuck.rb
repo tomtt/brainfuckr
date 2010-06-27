@@ -11,7 +11,7 @@ class Brainfuck
   attr_reader :input, :output, :tape, :data_pointer
 
   def initialize(program)
-    @program = program
+    @program = program.tr('^><+\-.,[]?','')
     @output = ""
     @tape = [0]
     @data_pointer = 0
@@ -47,6 +47,8 @@ class Brainfuck
         execute_put
       when ","
         execute_get
+      when '?'
+        puts state
       end
       @instruction_pointer += 1
     end
@@ -57,7 +59,7 @@ class Brainfuck
     state = "\n"
     state += @program + "\n"
     state += " " * @instruction_pointer + "^\n"
-    state += "[%s]" % @tape.map { |value| sprintf("%3d" % value) }.join(", ") + "\n"
+    state += "[%s]" % @tape.map { |value| sprintf("%3s" % value) }.join(", ") + "\n"
     state += " " + "     " * @data_pointer + "---\n"
     state
   end

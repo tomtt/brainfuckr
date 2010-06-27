@@ -97,6 +97,13 @@ end
     its(:tape) { should == [0, 6] }
   end
 
+  it "puts whatever the state method returns when a '?' command is encountered" do
+    bf = Brainfuck.new('?')
+    bf.stub!(:state).and_return("my state")
+    bf.should_receive(:puts).with("my state")
+    bf.execute
+  end
+
   it "raises an error when moving the data_pointer beyond the first position" do
     lambda { Brainfuck.new("<").execute }.should raise_error
   end
